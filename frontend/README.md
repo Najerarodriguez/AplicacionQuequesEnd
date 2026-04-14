@@ -1,3 +1,53 @@
+El diagnóstico está claro. El debug confirma dos cosas:
+
+1. `pythonVenvDir` **no es una propiedad válida** en esta versión del CLI (`firebase-tools 15.5.1`) — la ignora completamente
+2. Firebase **siempre busca `venv`** sin importar lo que pongas en `firebase.json`
+
+## Solución definitiva — crear el `venv` donde Firebase lo espera
+
+Ejecuta esto exactamente así:
+
+```bash
+cd C:\Users\root1\Documents\CODE\AplicacionQuequesEnd\backend
+
+python -m venv venv
+
+venv\Scripts\activate
+
+pip install firebase-functions firebase-admin
+```
+
+Luego quita `pythonVenvDir` del `firebase.json` y déjalo así:
+
+```json
+{
+  "functions": {
+    "source": ".",
+    "runtime": "python312"
+  }
+}
+```
+
+Luego despliega:
+
+```bash
+firebase deploy --only functions
+```
+
+---
+
+## ¿Por qué no funcionó `pythonVenvDir`?
+
+El debug lo dice explícitamente:
+
+```
+Object "/functions" in "firebase.json" has unknown property: {"additionalProperty":"pythonVenvDir"}
+```
+
+Esa opción no existe en `firebase-tools 15.5.1`. La CLI **siempre** busca una carpeta llamada exactamente `venv` dentro del directorio `source`. No hay forma de cambiarle el nombre — hay que crearlo con ese nombre.
+
+---------
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
